@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remove Background</title>
+</head>
+<body>
+
+<canvas id="image-input"></canvas>
+<input type="file" id="file-input" name="file" accept="image/*" onchange="upload()">
+<button onclick="removeBackground()">remove Background</button>
+<canvas id="image-output"></canvas>
+<script>
+
+    function upload() {
+        let file = document.getElementById('file-input').files[0];
+        SendToCanvas(URL.createObjectURL(file), 'image-input');
+    }
+
+    function SendToCanvas(url, cavansId) {
+        let canvas = document.getElementById(cavansId);
+        let ctx = canvas.getContext('2d');
+        let img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function () {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+        };
+        img.src = url;
+    }
+
+</script>
+</body>
+</html>
+<script async src="opencv.js"></script>
+<!--<script async src="math.min.js"></script>-->
+<script>
+    function removeBackground() {
+        let img = cv.imread('image-input');
+        let dst = new cv.Mat(img.matSize[0], img.matSize[1], cv.CV_8UC3, new cv.Scalar(0));
+        cv.cvtColor(img, dst, cv.COLOR_BGRA2BGR);
+        img = dst;
+        let mask = new cv.Mat(img.matSize[0], img.matSize[1], cv.CV_8UC1, new cv.Scalar(0));
+        let rect = new cv.Rect(10, 10, img.matSize[0], img.matSize[1]);
+        let bgdModel = new cv.Mat(1, 65, cv.CV_64FC1, new cv.Scalar(0));
+        let fbgModel = new cv.Mat(1, 65, cv.CV_64FC1, new cv.Scalar(0));
+        cv.grabCut(img, mask, rect, bgdModel, fbgModel, 10, cv.GC_INIT_WITH_RECT);
+        console.log(mask);
+        for (let i = 0; i < mask.data.length; i++) {
+            if (mask.data[i] == 2) {
+                mask.data[i] = 0;
+            } else {
+                mask.data[i] = 1;
+            }
+        }
+        for (let i = 0; i < img.data.length; i++) {
+            if (mask.data[i] == 0) {
+                img.data[i * 3] = 0;
+                img.data[i * 3 + 1] = 0;
+                img.data[i * 3 + 2] = 0;
+            } else {
+            }
+        }
+        console.log(mask.data.length, img.data.length);
+
+        cv.imshow('image-output', img)
+    }
+</script>
