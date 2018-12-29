@@ -8,4 +8,4 @@ This is a demo that I wrote and played, based on [opencv.js](https://opencv.org)
 ## 0x01 Run screenshot
 (Image from the network, if it involves infringement, please mention issues, I will delete it immediately)
 
-![Run screenshot](Screenshot from 2018-12-29 15-51-14.png)
+<img src="Screenshot from 2018-12-29 15-51-14.png" alt='Run screenshot'>
